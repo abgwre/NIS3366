@@ -7,8 +7,8 @@ create table hot(
     ranking int(2),
     plat char(10)
 );
-
 '''
+
 import pymysql
 import time
 
@@ -35,7 +35,7 @@ def get_current_time():
 
     return current_time
 
-def insert_info(hot_name, emotion, ranking, plat):
+def insert_info(hot_name, emotion, ranking, plat):                      #分析结果输入数据库
     current_time = get_current_time()
     '''hot_name = 'test2'
     emotion = 0.35
@@ -57,7 +57,7 @@ def insert_info(hot_name, emotion, ranking, plat):
 
     conn.close()
 
-def read_certain_info(hot_name, plat):      #获取指定平台指定热搜在数据库中的信息
+def read_certain_info(hot_name, plat):                                  #获取指定平台指定热搜在数据库中的信息
     conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', database='nis', charset='utf8')
 
     cur = conn.cursor()
@@ -92,7 +92,7 @@ def read_certain_info(hot_name, plat):      #获取指定平台指定热搜在�
     #    print(line)
 
 
-def read_hot_now(plat):             #获取当前时段热搜信息
+def read_hot_now(plat):                                                 #获取当前时段热搜信息
     conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', database='nis', charset='utf8')
 
     cur = conn.cursor()
