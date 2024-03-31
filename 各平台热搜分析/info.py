@@ -81,9 +81,6 @@ def read_certain_info(hot_name, plat):                                  #获取�
 
     conn.close()
 
-    for line in fetch:
-        print(line)
-
     return fetch
 
 
@@ -117,8 +114,5 @@ def read_hot_now(plat):                                                 #获取�
     fetch = cur.fetchall()
 
     conn.close()
-
-    for line in fetch:
-        print(line)
 
     return fetch
