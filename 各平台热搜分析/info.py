@@ -145,7 +145,7 @@ def select_hot_name(hot_name, plat):                                    #模糊�
             ranking,
             plat
         FROM hot 
-        WHERE name LIKE %s
+        WHERE name LIKE %s AND plat = %s
         GROUP BY name, time, ranking, plat
         ORDER BY time;'''
     # print(sql_select)
@@ -154,7 +154,7 @@ def select_hot_name(hot_name, plat):                                    #模糊�
 
     value = (hot_name, plat)
 
-    row_count = cur.execute(sql_select, hot_name)
+    row_count = cur.execute(sql_select, value)
 
     fetch = cur.fetchall()
 
