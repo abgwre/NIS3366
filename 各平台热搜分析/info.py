@@ -121,7 +121,9 @@ def read_hot_now(plat):                                                 #获取�
         ORDER BY time;'''
     # print(sql_select)
 
-    row_count = cur.execute(sql_select)
+    value = (current_time, plat)
+
+    row_count = cur.execute(sql_select, value)
 
     fetch = cur.fetchall()
 
