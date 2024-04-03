@@ -47,10 +47,20 @@ def insert_info(hot_name, emotion, ranking, plat):                      #分析�
 
     cur = conn.cursor()
 
-    sql_insert = "insert into hot values ('" + current_time + "','" + hot_name + "'," + str(emotion) + "," + str(ranking) \
-                 + ",'" + plat + "');"
+    sql_exist = "SELECT EXISTS(SELECT * FROM hot WHERE name = %s AND time = %s);"
+    sql_del = "DELETE FROM hot WHERE name = %s AND time = %s"
 
-    i = cur.execute(sql_insert)
+    value0 = (hot_name, current_time)
+
+    if cur.execute(sql_exist, value0):                                  #更新数据
+        cur.execute(sql_del, value0)
+        conn.commit()
+
+    sql_insert = "INSERT INTO hot values (%s, %s, %s, %s, %s);"
+
+    value = (current_time, hot_name, str(emotion), str(ranking), plat)
+
+    i = cur.execute(sql_insert, value)
     print(i)
 
     conn.commit()
@@ -69,13 +79,15 @@ def read_certain_info(hot_name, plat):                                  #获取�
             time,
             ranking,
             plat
-        FROM hot ''' + \
-        "WHERE name = '" + hot_name + "' AND plat = '" + plat + "' "\
-        '''GROUP BY name, time, ranking, plat
+        FROM hot 
+        WHERE name = %s AND plat = %s
+        GROUP BY name, time, ranking, plat
         ORDER BY time;'''
     #print(sql_select)
 
-    row_count = cur.execute(sql_select)
+    value = (hot_name, plat)
+
+    row_count = cur.execute(sql_select, value)
 
     fetch = cur.fetchall()
 
@@ -97,19 +109,50 @@ def read_hot_now(plat):                                                 #获取�
     current_time = get_current_time()
 
     sql_select = '''
-            SELECT
-                name,
-                AVG(emotion) AS avg_emotion,
-                time,
-                ranking,
-                plat
-            FROM hot ''' + \
-            "WHERE time = '" + current_time + "' AND plat = '" + plat + "' "\
-            '''GROUP BY name, time, ranking, plat
-            ORDER BY time;'''
+        SELECT
+            name,
+            AVG(emotion) AS avg_emotion,
+            time,
+            ranking,
+            plat
+        FROM hot
+        WHERE time = %s AND plat = %s 
+        GROUP BY name, time, ranking, plat
+        ORDER BY time;'''
     # print(sql_select)
 
     row_count = cur.execute(sql_select)
+
+    fetch = cur.fetchall()
+
+    conn.close()
+
+    return fetch
+
+
+def select_hot_name(hot_name, plat):                                    #模糊查询
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', database='nis', charset='utf8')
+
+    cur = conn.cursor()
+
+    sql_select = '''
+        SELECT
+            name,
+            AVG(emotion) AS avg_emotion,
+            time,
+            ranking,
+            plat
+        FROM hot 
+        WHERE name LIKE %s
+        GROUP BY name, time, ranking, plat
+        ORDER BY time;'''
+    # print(sql_select)
+
+    hot_name = "%" + hot_name + "%"
+
+    value = (hot_name, plat)
+
+    row_count = cur.execute(sql_select, hot_name)
 
     fetch = cur.fetchall()
 
