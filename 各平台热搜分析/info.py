@@ -1,7 +1,7 @@
 '''
 time name emotion rank plat
 create table hot(
-    time datetime,
+    time char(40),
     name char(30),
     emotion float(6,4),
     ranking int(2),
@@ -43,7 +43,7 @@ def insert_info(hot_name, emotion, ranking, plat):                      #分析�
     plat = 'wb'
     '''
 
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', database='nis', charset='utf8')
+    conn = pymysql.connect(host='172.29.25.151', port=3307, user='root', password='123456', database='nis', charset='utf8')
 
     cur = conn.cursor()
 
@@ -68,7 +68,7 @@ def insert_info(hot_name, emotion, ranking, plat):                      #分析�
     conn.close()
 
 def read_certain_info(hot_name, plat):                                  #获取指定平台指定热搜在数据库中的信息
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', database='nis', charset='utf8')
+    conn = pymysql.connect(host='172.29.25.151', port=3307, user='root', password='123456', database='nis', charset='utf8')
 
     cur = conn.cursor()
 
@@ -102,7 +102,7 @@ def read_certain_info(hot_name, plat):                                  #获取�
 
 
 def read_hot_now(plat):                                                 #获取当前时段热搜信息
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', database='nis', charset='utf8')
+    conn = pymysql.connect(host='172.29.25.151', port=3307, user='root', password='123456', database='nis', charset='utf8')
 
     cur = conn.cursor()
 
@@ -118,7 +118,7 @@ def read_hot_now(plat):                                                 #获取�
         FROM hot
         WHERE time = %s AND plat = %s 
         GROUP BY name, time, ranking, plat
-        ORDER BY time;'''
+        ORDER BY ranking;'''
     # print(sql_select)
 
     value = (current_time, plat)
@@ -133,7 +133,7 @@ def read_hot_now(plat):                                                 #获取�
 
 
 def select_hot_name(hot_name, plat):                                    #模糊查询
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password='123456', database='nis', charset='utf8')
+    conn = pymysql.connect(host='172.29.25.151', port=3307, user='root', password='123456', database='nis', charset='utf8')
 
     cur = conn.cursor()
 
