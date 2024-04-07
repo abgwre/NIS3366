@@ -1,4 +1,5 @@
 import info
+from comment1 import read
 import sys
 import pymysql
 from PySide2.QtWidgets import QApplication, QMessageBox, QWidget, QShortcut, QSizePolicy, QListView, QVBoxLayout, \
@@ -11,7 +12,7 @@ from func_timeout import func_set_timeout
 
 class Window(QWidget):
 
-    def __init__(self, t):                                                                             #界面初始化
+    def __init__(self, t):
 
         super().__init__(t[0])
         self.s = None
@@ -24,36 +25,33 @@ class Window(QWidget):
 
         self.ui = QUiLoader().load(qfile_stats)
 
+        self.ui.setGeometry(100, 100, 800, 600)
+
         self.list = []
 
+        Time = '2024-04-07 13_59_33'
+        filename = '热搜' + Time + '.csv'
+        read(filename, Time)
 
         # 创建一个封装列表的数据源
         listmodel = QStringListModel()
-        for i in info.read_hot_now(t[1]):
+        for i in info.read_hot_now(t[1]):                                                               #加载当前热搜
             text = str(i[3]) + ' ' + i[0]
             self.list.append(text)
 
         listmodel.setStringList(self.list)
         self.ui.hotview.setModel(listmodel)
 
-        self.ui.hotview.doubleClicked.connect(self.clicked)
-        self.ui.search.clicked.connect(lambda: self.plot([self.ui.SearchBox.currentText(), self]))
-        self.ui.renew.clicked.connect(lambda: self.renew(t[1]))
+        self.ui.hotview.doubleClicked.connect(self.clicked)                                             #双击当前热搜进行分析
+        self.ui.search.clicked.connect(lambda: self.plot([self.ui.SearchBox.currentText(), self]))      #根据搜索框中热搜进行分析
+        self.ui.renew.clicked.connect(lambda: self.renew(t[1]))                                         #更新搜索框中内容
         self.ui.ButtonReturn.clicked.connect(self.return_to_mainwindow)
+        self.ui.rescan.clicked.connect(self.rescan)
 
-
-        '''self.ui.setFixedWidth(900)
-        self.ui.setFixedHeight(600)
-
-        self.ui.ButtonWB.clicked.connect(lambda: self.Input('0'))   '''                                #计算器输入字符按键
-
-    '''        self.ui.ActionGame.triggered.connect(self.Play)                                             #打开速算练习界面
-        self.ui.ActionQuit.triggered.connect(self.Quit)'''
     def clicked(self, item):
-        # self, 弹框名称， 弹框内容
         #QMessageBox.information(self, "QListView", "选择了" + self.list[item.row()])
         text = self.list[item.row()]
-        text = text[2:]
+        text = text[2:]                                                                                 #传递热搜名
         text = [text, self]
         self.plot(text)
 
@@ -64,7 +62,7 @@ class Window(QWidget):
 
         cur = conn.cursor()
 
-        sql_exist = "SELECT EXISTS(SELECT * FROM hot WHERE name = %s);"
+        sql_exist = "SELECT EXISTS(SELECT * FROM hot WHERE name = %s);"                                 #判断搜索框中热搜是否存在
 
         cur.execute(sql_exist, text[0])
 
@@ -72,7 +70,7 @@ class Window(QWidget):
 
         conn.close()
 
-        if fetch[0] == 0:  # 更新数据
+        if fetch[0] == 0:                                                                               #更新数据
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
             msg.setText("热搜不存在")
@@ -81,7 +79,7 @@ class Window(QWidget):
         else:
             import plotwindow
             self.ui.hide()
-            self.s = plotwindow.LineChart(text)
+            self.s = plotwindow.LineChart(text)                                                         #打开作图窗口绘制趋势图
             self.s.show()
 
     def renew(self, plat):
@@ -92,7 +90,7 @@ class Window(QWidget):
         if text == '':
             return
 
-        for i in info.select_hot_name(text, plat):
+        for i in info.select_hot_name(text, plat):                                                      #通过模糊查询获取相关热搜
             if i[0] not in search_list:
                 search_list.append(i[0])
         self.ui.SearchBox.clear()
@@ -102,3 +100,6 @@ class Window(QWidget):
     def return_to_mainwindow(self):
         self.ui.close()
         self.t0[0].ui.show()
+
+    def rescan(self):
+        read('热搜2024-04-07 13_59_33.csv')

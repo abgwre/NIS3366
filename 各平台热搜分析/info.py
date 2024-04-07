@@ -52,7 +52,11 @@ def insert_info(hot_name, emotion, ranking, plat):                      #分析�
 
     value0 = (hot_name, current_time)
 
-    if cur.execute(sql_exist, value0):                                  #更新数据
+    cur.execute(sql_exist, value0)
+
+    fetch = cur.fetchone()
+
+    if fetch[0] == 1:                                                   #更新数据
         cur.execute(sql_del, value0)
         conn.commit()
 
@@ -61,7 +65,6 @@ def insert_info(hot_name, emotion, ranking, plat):                      #分析�
     value = (current_time, hot_name, str(emotion), str(ranking), plat)
 
     i = cur.execute(sql_insert, value)
-    print(i)
 
     conn.commit()
 
@@ -83,7 +86,6 @@ def read_certain_info(hot_name, plat):                                  #获取�
         WHERE name = %s AND plat = %s
         GROUP BY name, time, ranking, plat
         ORDER BY time;'''
-    #print(sql_select)
 
     value = (hot_name, plat)
 
@@ -94,12 +96,6 @@ def read_certain_info(hot_name, plat):                                  #获取�
     conn.close()
 
     return fetch
-
-
-    # 获取所有数据用法
-    #for line in fetch():        line即为元组
-    #    print(line)
-
 
 def read_hot_now(plat):                                                 #获取当前时段热搜信息
     conn = pymysql.connect(host='172.29.25.151', port=3307, user='root', password='123456', database='nis', charset='utf8')
@@ -119,7 +115,6 @@ def read_hot_now(plat):                                                 #获取�
         WHERE time = %s AND plat = %s 
         GROUP BY name, time, ranking, plat
         ORDER BY ranking;'''
-    # print(sql_select)
 
     value = (current_time, plat)
 

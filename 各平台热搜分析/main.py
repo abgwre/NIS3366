@@ -1,6 +1,6 @@
 import menu
 
 app = menu.QApplication([])
-stats = menu.MainMenu()
+stats = menu.MainWindow()
 stats.ui.show()
 app.exec_()
